@@ -5,6 +5,8 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,20 +40,43 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
             tvRating = itemView.findViewById(R.id.tvRating);
             ivPoster = itemView.findViewById(R.id.ivPoster);
         }
+
+        public void bind(Movie movie){
+            Log.i("MoviesAdapter", movie.getTitle());
+
+            // Populate the data into the template view using the data object
+            tvName.setText(movie.getTitle());
+
+            Resources resources = tvName.getResources();
+            double movieRating = movie.getRating();
+
+            if (movieRating > 6) {
+                view.setBackgroundColor(Color.GREEN);
+            }
+
+            String ratingText = String.format(resources.getString(R.string.rating), movieRating);
+            tvRating.setText(ratingText);
+
+            Glide.with(ivPoster.getContext()).load(movie.getPosterUrl()).into(
+                    ivPoster);
+        }
     }
 
+    //constructor with 1 arg
     public MoviesAdapter(List<Movie> movies) {
+        Log.i("MoviesAdapter", "Adapter created");
         this.movies = movies;
     }
 
     @Override
     public int getItemCount() {
-        return 0;
+        return movies.size();
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        Log.i("MoviesAdapter", "ViewHolder created");
         Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
 
@@ -64,25 +89,10 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
     }
 
     @Override
-    public void onBindViewHolder(MoviesAdapter.ViewHolder viewHolder, int position) {
-
+    public void onBindViewHolder(ViewHolder viewHolder, int position) {
+        Log.i("MoviesAdapter", "ViewHolder binding");
         Movie movie = movies.get(position);
-
-        // Populate the data into the template view using the data object
-        viewHolder.tvName.setText(movie.getTitle());
-
-        Resources resources = viewHolder.tvName.getResources();
-        double movieRating = movie.getRating();
-
-        if (movieRating > 6) {
-            viewHolder.view.setBackgroundColor(Color.GREEN);
-        }
-
-        String ratingText = String.format(resources.getString(R.string.rating), movieRating);
-        viewHolder.tvRating.setText(ratingText);
-
-        Glide.with(viewHolder.ivPoster.getContext()).load(movie.getPosterUrl()).into(
-                viewHolder.ivPoster);
+        viewHolder.bind(movie);
 
     }
 }
